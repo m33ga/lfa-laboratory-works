@@ -39,41 +39,19 @@ def main():
         "D": ["cS", "a"]
     }
 
-    print("Non-terminals:", vn)
-    print("Terminals:", vt)
-    print("Rules:")
-    for key in p:
-        print(f"{key} -> {p[key]}")
-
     grammar = Grammar(vn, vt, p, "S")
-    generated_words = []
-    print("generating words:")
-    for i in range(5):
-        generated_words.append(grammar.generate_string())
-        print(generated_words[i])
-        print()
+    print(grammar)
 
-    print("generated words:")
-    for word in generated_words:
-        print(word)
     print()
-
     print(grammar.get_grammar_type())
 
     fa = grammar.to_finite_automaton()
-    # some simple test cases
-    print('checking some simple strings belong to language')
-    test_strings = ["aa", "abb", "aac", "baba", "bca"]
-    for test in test_strings:
-        print(f"'{test}' accepted: {fa.string_belongs_to_language(test)}")
-
-    print('checking the previously generated words:')
-    for word in generated_words:
-        print(f"'{word}' accepted: {fa.string_belongs_to_language(word)}")
+    print()
+    print(fa)
+    print(fa.is_nfa())
 
     new_grammar = fa.to_grammar()
     print()
-    print("new grammar")
     print(new_grammar)
 
 

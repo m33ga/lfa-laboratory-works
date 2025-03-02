@@ -44,4 +44,30 @@ class FiniteAutomaton:
         return Grammar(V_n, V_t, P, start_symbol)
 
     def is_nfa(self):
-        pass
+        for (state, symbol), next_states in self.transitions.items():
+            if len(next_states) > 1:
+                return True
+        return False
+
+    def __str__(self):
+        transitions_str = "\n".join(
+            [f"  {state} --{symbol}--> {next_states}"
+             for (state, symbol), next_states in self.transitions.items()]
+        )
+        accept_states_str = ", ".join(self.accept_states)
+
+        return (
+            f"Finite Automaton:\n"
+            f"States: {', '.join(self.states)}\n"
+            f"Alphabet: {', '.join(self.alphabet)}\n"
+            f"Start State: {self.start_state}\n"
+            f"Accept States: {accept_states_str}\n"
+            f"Transitions:\n{transitions_str}"
+        )
+
+    def __repr__(self):
+        return (
+            f"FiniteAutomaton(states={self.states}, "
+            f"alphabet={self.alphabet}, transitions={self.transitions}, "
+            f"start_state={self.start_state}, accept_states={self.accept_states})"
+        )

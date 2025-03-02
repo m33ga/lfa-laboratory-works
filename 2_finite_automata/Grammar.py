@@ -40,9 +40,15 @@ class Grammar:
 
         for nt, productions in self.P.items():
             for production in productions:
-                if len(production) == 1 and production in self.V_t:
-                    transitions.setdefault((nt, production), set()).add("q_accept")
-                elif len(production) > 1:
+                if production[0] in self.V_t:
+
+                    if len(production) == 1:
+                        transitions.setdefault((nt, production), set()).add("q_accept")
+                    else:
+                        transitions.setdefault((nt, production[0]), set()).add(production[1:])
+
+                elif production[0] in self.V_n:
+
                     transitions.setdefault((nt, production[0]), set()).add(production[1:])
 
         return FiniteAutomaton(states, alphabet, transitions, start_state, accept_states)
@@ -114,12 +120,12 @@ class Grammar:
             return "Invalid"
 
     def __str__(self):
-        p_rules = "".join(f"{key} -> {prod}\n" for key, prod in self.P.items())
+        p_rules = ";\n".join(f"{key} -> {prod}" for key, prod in self.P.items())
         return (
                 f"Non-terminals: {self.V_n}\n"
                 f"Terminals: {self.V_t}\n"
                 f"Start symbol: {self.S}\n"
-                f"Production Rules:\n{p_rules}"
+                f"Production Rules:\n{p_rules}\n"
         )
 
 
