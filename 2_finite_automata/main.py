@@ -35,14 +35,13 @@ def main():
     vt = {"a", "b", "c"}
     p = {
         "S": ["aF", "bS"],
-        "F": ["bF", "cD", "a"],
-        "D": ["cS", "a"]
+        "F": ["bF", "bD", "a"],
+        "D": ["cS", "aF"]
     }
 
     grammar = Grammar(vn, vt, p, "S")
     print(grammar)
 
-    print()
     print(grammar.get_grammar_type())
 
     fa = grammar.to_finite_automaton()
@@ -50,9 +49,11 @@ def main():
     print(fa)
     print(fa.is_nfa())
 
-    new_grammar = fa.to_grammar()
-    print()
-    print(new_grammar)
+    fa1 = fa.nfa_to_dfa()
+    print(fa1)
+    # new_grammar = fa.to_grammar()
+    # print()
+    # print(new_grammar)
 
 
 if __name__ == "__main__":
