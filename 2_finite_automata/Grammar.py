@@ -116,23 +116,23 @@ class Grammar:
         if not is_invalid:
             if is_type_3:
                 if is_left_linear:
-                    return "Type 3 - Left Linear Regular Grammar"
+                    return 3, "Type 3 - Left Linear Regular Grammar"
                 elif is_right_linear:
-                    return "Type 3 - Right Linear Regular Grammar"
+                    return 3, "Type 3 - Right Linear Regular Grammar"
 
             elif is_type_2:
-                return "Type 2 - Context-Free Grammar"
+                return 2, "Type 2 - Context-Free Grammar"
 
             elif is_type_1:
-                return "Type 1 - Context-Sensitive Grammar"
+                return 1, "Type 1 - Context-Sensitive Grammar"
 
             elif is_type_0:
-                return "Type 0 - Unrestricted Grammar"
+                return 0, "Type 0 - Unrestricted Grammar"
         else:
-            return "Invalid"
+            return -1, "Invalid"
 
     def __str__(self):
-        p_rules = ";\n".join(f"{key} -> {prod}" for key, prod in self.P.items())
+        p_rules = ";\n".join(f"{set(key)} -> {prod}" for key, prod in self.P.items())
         return (
                 f"Non-terminals: {self.V_n}\n"
                 f"Terminals: {self.V_t}\n"

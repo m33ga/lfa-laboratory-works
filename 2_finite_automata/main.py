@@ -1,5 +1,5 @@
 from Grammar import Grammar
-
+import os
 # variant 12
 
 # previous grammar:
@@ -29,31 +29,51 @@ from Grammar import Grammar
 # δ(q3,a) = q3,
 # δ(q2,a) = q3.
 
+# TODO: find consistent way of representing FAs
+#       accept both right and left linear type 3 grammars
+#       be able to differentiate NFA and DFA
+#       check is_nfa
+#       convert NFA to DFA
+#       draw graph for FA
+#       convert grammar to FA and FA to grammar
+
 def main():
-    # variant 12
+
+    # lab 1, variant 12
     vn = {"S", "F", "D"}
     vt = {"a", "b", "c"}
     p = {
         "S": ["aF", "bS"],
         "F": ["bF", "bD", "a"],
-        "D": ["cS", "aF"]
+        "D": ["cS", "a"]
     }
-
+    # create grammar
     grammar = Grammar(vn, vt, p, "S")
     print(grammar)
+    # print grammar type
+    print(grammar.get_grammar_type()[1])
 
-    print(grammar.get_grammar_type())
-
+    # create finite automaton
     fa = grammar.to_finite_automaton()
-    print()
+    print(f"FA is NFA: {fa.is_nfa()}")
     print(fa)
-    print(fa.is_nfa())
+    fa.draw_graph("fa1")
 
-    fa1 = fa.nfa_to_dfa()
-    print(fa1)
-    # new_grammar = fa.to_grammar()
-    # print()
-    # print(new_grammar)
+    # convert to dfa if nfa
+    dfa = fa.nfa_to_dfa()
+    print(f"FA is NFA: {dfa.is_nfa()}")
+    print("Converted to DFA")
+    print(dfa)
+
+    dfa.draw_graph("dfa1")
+
+    new_grammar = fa.to_grammar()
+    print()
+    print(new_grammar)
+
+    new_grammar = dfa.to_grammar()
+    print()
+    print(new_grammar)
 
 
 if __name__ == "__main__":

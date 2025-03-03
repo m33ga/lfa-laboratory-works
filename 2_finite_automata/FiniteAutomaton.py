@@ -46,7 +46,7 @@ class FiniteAutomaton:
     def is_nfa(self):
         for transitions in self.transitions.values():
             for next_states in transitions.values():
-                if len(next_states) > 1:
+                if len(next_states) > 1 and next_states not in self.states:
                     return True
         return False
 
@@ -130,7 +130,7 @@ class FiniteAutomaton:
 
     def __str__(self):
         transitions_str = "\n".join(
-            f"{state} --({symbol})--> {next_states}"
+            f"{set(state)} --({symbol})--> {next_states}"
             for state, transitions in self.transitions.items()
             for symbol, next_states in transitions.items()
         )
