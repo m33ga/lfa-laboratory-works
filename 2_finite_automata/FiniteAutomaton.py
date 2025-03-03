@@ -2,51 +2,52 @@ class FiniteAutomaton:
     def __init__(self, states, alphabet, transitions, start_state, accept_states):
         self.states = states
         self.alphabet = alphabet
-        self.transitions = transitions
+        self.transitions = transitions  # dict {frozenset: dict{symbol: set(next states)}
         self.start_state = start_state
         self.accept_states = accept_states
 
     def string_belongs_to_language(self, input_string):
         current_states = {self.start_state}
 
-        for symbol in input_string:
+        for char in input_string:
+            if char not in self.alphabet:
+                return False
+
             next_states = set()
             for state in current_states:
-                if (state, symbol) in self.transitions:
-                    next_states.update(self.transitions[(state, symbol)])
-            if not next_states:
-                return False
+                if state in self.transitions and char in self.transitions[state]:
+                    next_states.update(self.transitions[state][char])
             current_states = next_states
 
-        return any(state in self.accept_states for state in current_states)
+            if not current_states:
+                return False
+
+        return bool(current_states.intersection(self.accept_states))
 
     def to_grammar(self):
         from Grammar import Grammar
-        V_n = {state for state in self.states}
+        V_n = self.states
         V_t = self.alphabet
         P = {}
-        start_symbol = self.start_state
 
-        # transitions -> production rules
-        for (state, symbol), next_states in self.transitions.items():
+        for state, transitions in self.transitions.items():
+            for symbol, next_states in transitions.items():
+                for next_state in next_states:
+                    if state not in P:
+                        P[state] = []
+                    if next_state in self.accept_states:
+                        P[state].append(symbol)  # A -> a
+                    else:
+                        P[state].append(f"{symbol}{next_state}")  # A -> aB
 
-            if state not in P:
-                P[state] = []
-
-            for next_state in next_states:
-                P[state].append(f"{symbol}{next_state}")
-
-        for accept_state in self.accept_states:
-            if accept_state not in P:
-                P[accept_state] = []
-            P[accept_state].append("")
-
-        return Grammar(V_n, V_t, P, start_symbol)
+        S = self.start_state
+        return Grammar(V_n, V_t, P, S)
 
     def is_nfa(self):
-        for (state, symbol), next_states in self.transitions.items():
-            if len(next_states) > 1:
-                return True
+        for transitions in self.transitions.values():
+            for next_states in transitions.values():
+                if len(next_states) > 1:
+                    return True
         return False
 
     def nfa_to_dfa(self):
@@ -57,56 +58,86 @@ class FiniteAutomaton:
 
         dfa_states = []
         dfa_transitions = {}
-        dfa_accept_states = set()
-        dfa_start_state = frozenset([self.start_state])
-        dfa_states.append(dfa_start_state)
-
-        # queue
-        unprocessed_states = [dfa_start_state]
+        unprocessed_states = [self.start_state.copy()]
+        processed_states = set()
 
         while unprocessed_states:
-            current_dfa_state = unprocessed_states.pop()
+            current_state = unprocessed_states.pop(0)
+            processed_states.add(frozenset(current_state))
+            dfa_states.append(current_state)
+
             for symbol in self.alphabet:
-                next_dfa_state = set()
-                for nfa_state in current_dfa_state:
-                    if (nfa_state, symbol) in self.transitions:
-                        next_dfa_state.update(self.transitions[(nfa_state, symbol)])
+                next_state = set()
+                for s in current_state:
+                    if s in self.transitions and symbol in self.transitions[s]:
+                        next_state.update(self.transitions[s][symbol])
 
-                if next_dfa_state:
-                    next_dfa_state = frozenset(next_dfa_state)
-                    if next_dfa_state not in dfa_states:
-                        dfa_states.append(next_dfa_state)
-                        unprocessed_states.append(next_dfa_state)
+                if next_state:
+                    next_state_frozen = frozenset(next_state)
+                    if next_state_frozen not in processed_states and next_state not in unprocessed_states:
+                        unprocessed_states.append(next_state.copy())
 
-                    dfa_transitions[(current_dfa_state, symbol)] = next_dfa_state
+                    dfa_transitions[frozenset(current_state)] = dfa_transitions.get(frozenset(current_state), {})
+                    dfa_transitions[frozenset(current_state)][symbol] = next_state.copy()
 
-                    if any(state in self.accept_states for state in next_dfa_state):
-                        dfa_accept_states.add(next_dfa_state)
+        dfa_accept_states = [
+            state for state in dfa_states if any(s in self.accept_states for s in state)
+        ]
 
         return FiniteAutomaton(
-            states=set(dfa_states),
-            alphabet=self.alphabet,
-            transitions=dfa_transitions,
-            start_state=dfa_start_state,
-            accept_states=dfa_accept_states
+            dfa_states,
+            self.alphabet,
+            {frozenset(k): v for k, v in dfa_transitions.items()},
+            self.start_state,
+            dfa_accept_states
         )
+
+    def draw_graph(self, name):
+        from graphviz import Digraph
+        import os
+
+        dot = Digraph(name=name, format="png")
+
+        def format_state(state):
+            sorted_states = sorted(state)
+            return "{{{}}}".format(", ".join(sorted_states)) if sorted_states else "∅"
+
+        for state in self.states:
+
+            formatted_state = format_state(state)
+            if any(state == accept for accept in self.accept_states):
+                dot.node(formatted_state, shape="doublecircle")
+            else:
+                dot.node(formatted_state, shape="circle")
+
+        dot.node("", shape="plaintext")
+        formatted_start = format_state(self.start_state)
+        dot.edge("", formatted_start, label="start")
+
+        for from_state, transitions in self.transitions.items():
+            formatted_from = format_state(from_state)
+            for symbol, to_states in transitions.items():
+                if to_states in self.states:
+                    formatted_to = format_state(to_states)
+                    dot.edge(formatted_from, formatted_to, label=symbol)
+                else:
+                    for inner_state in to_states:
+                        formatted_to = format_state(inner_state)
+                        dot.edge(formatted_from, formatted_to, label=symbol)
+
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "\graph_drawings\\")
+        dot.render(path + name, view=True)
 
     def __str__(self):
-        def format_state(state):
-            return f"{{{', '.join(state)}}}" if isinstance(state, frozenset) else str(state)
-
         transitions_str = "\n".join(
-            [f"  {format_state(state)} --{symbol}--> {format_state(next_states)}"
-             for (state, symbol), next_states in self.transitions.items()]
+            f"{state} --({symbol})--> {next_states}"
+            for state, transitions in self.transitions.items()
+            for symbol, next_states in transitions.items()
         )
-        accept_states_str = ", ".join(format_state(state) for state in self.accept_states)
-        states_str = ", ".join(format_state(state) for state in self.states)
-
         return (
-            f"Finite Automaton:\n"
-            f"States: {states_str}\n"
-            f"Alphabet: {', '.join(self.alphabet)}\n"
-            f"Start State: {format_state(self.start_state)}\n"
-            f"Accept States: {accept_states_str}\n"
+            f"States: {self.states}\n"
+            f"Alphabet: {self.alphabet}\n"
+            f"Start State: {self.start_state}\n"
+            f"Accept States: {self.accept_states}\n"
             f"Transitions:\n{transitions_str}"
         )

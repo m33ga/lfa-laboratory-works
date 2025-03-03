@@ -6,7 +6,7 @@ class Grammar:
         self.V_n = V_n
         self.V_t = V_t
         self.P = P
-        self.S = S
+        self.S = set(S)
 
     def generate_string(self, max_length=10):
         current_string = self.S
@@ -32,24 +32,36 @@ class Grammar:
 
     def to_finite_automaton(self):
         from FiniteAutomaton import FiniteAutomaton
-        states = self.V_n | {"q_accept"}
-        alphabet = self.V_t
+        states = set(self.V_n)
+        alphabet = set(self.V_t)
         transitions = {}
         start_state = self.S
-        accept_states = {"q_accept"}
+        accept_states = set()
 
-        for nt, productions in self.P.items():
-            for production in productions:
-                if production[0] in self.V_t:
+        for lhs, rhs_list in self.P.items():
+            if lhs not in transitions:
+                transitions[lhs] = {}
 
-                    if len(production) == 1:
-                        transitions.setdefault((nt, production), set()).add("q_accept")
-                    else:
-                        transitions.setdefault((nt, production[0]), set()).add(production[1:])
+            for rhs in rhs_list:
+                if len(rhs) == 1 and rhs in self.V_t:  # A -> a (terminal)
+                    if rhs not in transitions[lhs]:
+                        transitions[lhs][rhs] = set()
+                    transitions[lhs][rhs].add("X")
+                    accept_states.add("X")
 
-                elif production[0] in self.V_n:
+                elif len(rhs) == 2 and rhs[0] in self.V_t and rhs[1] in self.V_n:  # A -> aB
+                    symbol, next_state = rhs[0], rhs[1]
+                    if symbol not in transitions[lhs]:
+                        transitions[lhs][symbol] = set()
+                    transitions[lhs][symbol].add(next_state)
 
-                    transitions.setdefault((nt, production[0]), set()).add(production[1:])
+                elif len(rhs) == 2 and rhs[1] in self.V_t and rhs[0] in self.V_n:  # A -> Ba
+                    symbol, next_state = rhs[1], rhs[0]
+                    if symbol not in transitions[lhs]:
+                        transitions[lhs][symbol] = set()
+                    transitions[lhs][symbol].add(next_state)
+
+        states.add("X")
 
         return FiniteAutomaton(states, alphabet, transitions, start_state, accept_states)
 
@@ -125,7 +137,7 @@ class Grammar:
                 f"Non-terminals: {self.V_n}\n"
                 f"Terminals: {self.V_t}\n"
                 f"Start symbol: {self.S}\n"
-                f"Production Rules:\n{p_rules}\n"
+                f"Production Rules:\n{p_rules}"
         )
 
 
