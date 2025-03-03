@@ -125,8 +125,10 @@ class FiniteAutomaton:
                         formatted_to = format_state(inner_state)
                         dot.edge(formatted_from, formatted_to, label=symbol)
 
-        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "\graph_drawings\\")
-        dot.render(path + name, view=True)
+        dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "graph_drawings")
+        os.makedirs(dir_path, exist_ok=True)
+        file_path = os.path.join(dir_path, name)
+        dot.render(file_path, view=True)
 
     def __str__(self):
         transitions_str = "\n".join(
