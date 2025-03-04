@@ -1,8 +1,8 @@
 digraph FA1 {
 	"{X}" [shape=doublecircle]
+	"{S}" [shape=circle]
 	"{D}" [shape=circle]
 	"{F}" [shape=circle]
-	"{S}" [shape=circle]
 	"" [shape=plaintext]
 	"" -> "{S}" [label=start]
 	"{S}" -> "{F}" [label=a]

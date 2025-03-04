@@ -1,8 +1,8 @@
 digraph NFA {
-	"{B}" [shape=circle]
-	"{A}" [shape=circle]
-	"{D}" [shape=circle]
 	"{C}" [shape=doublecircle]
+	"{D}" [shape=circle]
+	"{A}" [shape=circle]
+	"{B}" [shape=circle]
 	"" [shape=plaintext]
 	"" -> "{A}" [label=start]
 	"{A}" -> "{B}" [label=a]
@@ -10,6 +10,6 @@ digraph NFA {
 	"{B}" -> "{C}" [label=a]
 	"{B}" -> "{B}" [label=c]
 	"{C}" -> "{D}" [label=a]
-	"{D}" -> "{B}" [label=a]
 	"{D}" -> "{D}" [label=a]
+	"{D}" -> "{B}" [label=a]
 }

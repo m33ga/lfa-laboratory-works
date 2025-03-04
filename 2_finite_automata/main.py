@@ -51,11 +51,7 @@ def main():
     # create finite automaton
     fa = grammar.to_finite_automaton()
     print("\nFinite Automaton:")
-    print(fa.states)
-    print(fa.accept_states)
-    print(fa.alphabet)
-    print(fa.start_state)
-    print(fa.transitions)
+    print(fa)
     print(f"FA is NFA: {fa.is_nfa()}")
     fa.draw_graph("FA1")
 
