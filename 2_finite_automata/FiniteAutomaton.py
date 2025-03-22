@@ -100,7 +100,7 @@ class FiniteAutomaton:
 
         def format_state(state):
             sorted_states = sorted(state)
-            return "{{{}}}".format(", ".join(sorted_states))  # if sorted_states else "∅"
+            return "{{{}}}".format(", ".join(sorted_states))
 
         for state in self.states:
 
