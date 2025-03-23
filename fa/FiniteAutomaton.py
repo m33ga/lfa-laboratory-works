@@ -125,7 +125,7 @@ class FiniteAutomaton:
                         formatted_to = format_state(inner_state)
                         dot.edge(formatted_from, formatted_to, label=symbol)
 
-        dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "graph_drawings")
+        dir_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../2_finite_automata/graph_drawings")
         os.makedirs(dir_path, exist_ok=True)
         file_path = os.path.join(dir_path, name)
         dot.render(file_path, view=True)

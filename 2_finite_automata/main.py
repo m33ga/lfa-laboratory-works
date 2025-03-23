@@ -1,6 +1,6 @@
-from Grammar import Grammar
-from FiniteAutomaton import FiniteAutomaton
-import os
+from fa import Grammar, FiniteAutomaton
+
+
 # variant 12
 
 # previous grammar:
