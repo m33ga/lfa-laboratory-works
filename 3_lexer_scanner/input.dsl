@@ -24,7 +24,7 @@ timeline romanHistory {
 
 main {
     for item in romanHistory {
-        if ( item.date.year <= 0) {
+        if ( item.year <= 0) {
             modify item {
                 importance = high;
             }
