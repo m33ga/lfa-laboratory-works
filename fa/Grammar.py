@@ -131,6 +131,34 @@ class Grammar:
         else:
             return -1, "Invalid"
 
+# task lab 5:
+    # Get familiar with the approaches of normalizing a grammar.
+    # Implement a method for normalizing an input grammar by the rules of CNF.
+    # The implementation needs to be encapsulated in a method with an appropriate signature (also ideally in an appropriate class/type).
+    # The implemented functionality needs executed and tested.
+    # Also, another BONUS point would be given if the student will make the aforementioned function to accept any grammar, not only the one from the student's variant.
+
+    def normalize_cnf(self):
+        # steps:
+        # 1. eliminate epsilon productions
+        # 2. eliminate renaming productions (X -> Y)
+        # 3. eliminate inaccessible states
+        # 4. eliminate non-productive symbols (not leading to terminal)
+        # 5. get CNF by adding new states
+
+        # variant 12:
+        # V_n = {S, A, B, C, D, X}
+        # V_t = {a, b}
+        # P = {
+        #     "S": ["A"],
+        #     "A": ["aX", "bX"],
+        #     "X": ["", "BX", "b"],
+        #     "B": ["AD"],
+        #     "D": ["aD", "a"],
+        #     "C": ["Ca"],
+        # }
+        pass
+
     def __str__(self):
         p_rules = ";\n".join(f"{set(key)} -> {prod}" for key, prod in self.P.items())
         return (
