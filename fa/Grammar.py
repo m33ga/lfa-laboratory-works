@@ -1,5 +1,5 @@
 import random
-
+from itertools import product
 
 class Grammar:
     def __init__(self, V_n, V_t, P, S):
@@ -131,7 +131,7 @@ class Grammar:
         else:
             return -1, "Invalid"
 
-# task lab 5:
+    # task lab 5:
     # Get familiar with the approaches of normalizing a grammar.
     # Implement a method for normalizing an input grammar by the rules of CNF.
     # The implementation needs to be encapsulated in a method with an appropriate signature (also ideally in an appropriate class/type).
@@ -157,15 +157,99 @@ class Grammar:
         #     "D": ["aD", "a"],
         #     "C": ["Ca"],
         # }
+
+        # step 1
+        nullable = self.get_nullable()
+        self.eliminate_epsilon_productions(nullable)
+
+        # step 2
+
+        # step 3
+        pass
+
+    def get_nullable(self):
+        nullable = set()
+        for lhs, rhs_list in self.P.items():
+            for prod in rhs_list:
+                if prod == "" or prod in nullable:
+                    nullable.add(lhs)
+                    rhs_list.remove("")
+        for lhs, rhs_list in self.P.items():
+            for prod in rhs_list:
+                if prod in nullable:
+                    nullable.add(lhs)
+
+        return nullable
+
+    def _get_combinations_replacing_epsilon(self, state_strings, separator_list):
+        parts = []
+        current_string = ''
+        for char in state_strings:
+            if char in separator_list and char in self.V_n:
+                if len(current_string) > 0:
+                    parts.append(current_string)
+                    current_string = ''
+                parts.append([char, ''])
+            else:
+                current_string += char
+        if len(current_string) > 0:
+            parts.append(current_string)
+        new_state_strings = product(*parts)
+        result = [''.join(state_string) for state_string in new_state_strings]
+
+        return result
+
+    def eliminate_epsilon_productions(self, nullable):
+        for lhs, rhs_list in self.P.items():
+            for idx, rhs in enumerate(rhs_list):
+                if any(c in rhs for c in nullable):
+                    rhs_list[idx:idx+1] = self._get_combinations_replacing_epsilon(rhs, nullable)
+
+    def eliminate_unit_productions(self):
+        for lhs, rhs_list in self.P.items():
+            reachable_states = set()
+            additional_transitions = set()
+            analyzed_states = set()
+            found = False
+            for rhs in rhs_list:
+                if rhs in self.V_n:
+                    reachable_states.add(rhs)
+                    found = True
+
+            while found:
+                found = False
+                for state in reachable_states:
+                    if state not in analyzed_states:
+                        for production in self.P[state]:
+                            if production in self.V_n and production not in analyzed_states and production not in reachable_states:
+                                found = True
+                                reachable_states.add(production)
+                            else:
+                                additional_transitions.add(production)
+                        analyzed_states.add(state)
+
+            if len(additional_transitions) > 0:
+                additional_transitions -= set(rhs_list)
+                rhs_list.extend(additional_transitions)
+
+
+    def eliminate_nonproductive(self):
+        pass
+
+    def eliminate_inaccessible(self):
+        pass
+
+    def replace_terminals(self):
+        pass
+
+    def replace_long_productions(self):
         pass
 
     def __str__(self):
         p_rules = ";\n".join(f"{set(key)} -> {prod}" for key, prod in self.P.items())
         return (
-                f"Non-terminals: {self.V_n}\n"
-                f"Terminals: {self.V_t}\n"
-                f"Start symbol: {self.S}\n"
-                f"Production Rules:\n{p_rules}"
+            f"Non-terminals: {self.V_n}\n"
+            f"Terminals: {self.V_t}\n"
+            f"Start symbol: {self.S}\n"
+            f"Production Rules:\n{p_rules}"
         )
-
-
