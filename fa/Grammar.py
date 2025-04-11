@@ -232,11 +232,27 @@ class Grammar:
                 additional_transitions -= set(rhs_list)
                 rhs_list.extend(additional_transitions)
 
-
     def eliminate_nonproductive(self):
-        pass
+        # remove production which don't result terminals
+        productive = set()
+        change_detected = True
+        while change_detected:
+            change_detected = False
+            for lhs, rhs_list in self.P.items():
+                for rhs in rhs_list:
+                    for symbol in rhs:
+                        if ((symbol in self.V_t and len(rhs) == 1) or (symbol in productive)) and lhs not in productive:
+                            productive.add(lhs)
+                            change_detected = True
+
+        unproductive = set(self.V_n) - productive
+        for state in unproductive:
+            del self.P[state]
 
     def eliminate_inaccessible(self):
+        # remove states which can not be reached
+        accessible = set()
+
         pass
 
     def replace_terminals(self):

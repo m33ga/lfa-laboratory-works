@@ -25,6 +25,10 @@ def main():
     grammar.eliminate_unit_productions()
     print()
     print(grammar)
+    grammar.eliminate_nonproductive()
+    print()
+    print(grammar)
+
 
 if __name__ == "__main__":
     main()
