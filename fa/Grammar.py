@@ -251,18 +251,45 @@ class Grammar:
 
     def eliminate_inaccessible(self):
         # remove states which can not be reached
-        accessible = set()
+        accessible = self.S.copy()
+        # accessible.add(self.S)
+        change_detected = True
+        while change_detected:
+            change_detected = False
+            for state in accessible.copy():
+                for production in self.P[state]:
+                    for symbol in production:
+                        if symbol in self.V_n and symbol not in accessible:
+                            accessible.add(symbol)
+                            change_detected = True
 
-        pass
+        inaccessible = set(self.V_n) - accessible
+        for state in inaccessible:
+            if state in self.P:
+                del self.P[state]
 
     def replace_terminals(self):
-        pass
+        terminal_dict = {}
+        for terminal in self.V_t:
+            new_state = f"T_{terminal}"
+            self.V_n.add(new_state)
+            self.P[new_state] = list(terminal)
+            terminal_dict[terminal] = new_state
+
+        for lhs, rhs_list in self.P.items():
+            new_rhs = []
+            for rhs in rhs_list:
+                if len(rhs) > 1:
+                    new_rhs.append([terminal_dict.get(symbol, symbol) for symbol in rhs])
+                else:
+                    new_rhs.append(rhs)
+            self.P[lhs] = new_rhs
 
     def replace_long_productions(self):
         pass
 
     def __str__(self):
-        p_rules = ";\n".join(f"{set(key)} -> {prod}" for key, prod in self.P.items())
+        p_rules = ";\n".join(f"{{{key}}} -> {prod}" for key, prod in self.P.items())
         return (
             f"Non-terminals: {self.V_n}\n"
             f"Terminals: {self.V_t}\n"

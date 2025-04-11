@@ -28,7 +28,12 @@ def main():
     grammar.eliminate_nonproductive()
     print()
     print(grammar)
-
+    grammar.eliminate_inaccessible()
+    print()
+    print(grammar)
+    grammar.replace_terminals()
+    print()
+    print(grammar)
 
 if __name__ == "__main__":
     main()
