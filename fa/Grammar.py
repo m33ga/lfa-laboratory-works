@@ -171,20 +171,24 @@ class Grammar:
         nullable = set()
         for lhs, rhs_list in self.P.items():
             for prod in rhs_list:
-                if prod == "" or prod in nullable:
+                if (prod == "" or prod in nullable) and lhs not in nullable:
                     nullable.add(lhs)
                     rhs_list.remove("")
-        for lhs, rhs_list in self.P.items():
-            for prod in rhs_list:
-                if prod in nullable:
-                    nullable.add(lhs)
+        found = True
+        while found:
+            found = False
+            for lhs, rhs_list in self.P.items():
+                for prod in rhs_list:
+                    if prod in nullable and lhs not in nullable:
+                        nullable.add(lhs)
+                        found = True
 
         return nullable
 
-    def _get_combinations_replacing_epsilon(self, state_strings, separator_list):
+    def _get_combinations_replacing_epsilon(self, state_string, separator_list):
         parts = []
         current_string = ''
-        for char in state_strings:
+        for char in state_string:
             if char in separator_list and char in self.V_n:
                 if len(current_string) > 0:
                     parts.append(current_string)
@@ -194,8 +198,8 @@ class Grammar:
                 current_string += char
         if len(current_string) > 0:
             parts.append(current_string)
-        new_state_strings = product(*parts)
-        result = [''.join(state_string) for state_string in new_state_strings]
+        iterables = [x if isinstance(x, list) else [x] for x in parts]
+        result = [''.join(p) for p in product(*iterables)]
 
         return result
 
@@ -224,13 +228,18 @@ class Grammar:
                             if production in self.V_n and production not in analyzed_states and production not in reachable_states:
                                 found = True
                                 reachable_states.add(production)
-                            else:
+                            elif production not in additional_transitions:
                                 additional_transitions.add(production)
                         analyzed_states.add(state)
 
             if len(additional_transitions) > 0:
                 additional_transitions -= set(rhs_list)
-                rhs_list.extend(additional_transitions)
+                for element in additional_transitions:
+                    if element not in rhs_list:
+                        rhs_list.append(element)
+                for element in reachable_states:
+                    if element in rhs_list:
+                        rhs_list.remove(element)
 
     def eliminate_nonproductive(self):
         # remove production which don't result terminals
