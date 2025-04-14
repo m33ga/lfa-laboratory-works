@@ -34,6 +34,10 @@ def main():
     grammar.replace_terminals()
     print()
     print(grammar)
+    grammar.replace_long_productions()
+    print()
+    print(grammar)
+
 
 if __name__ == "__main__":
     main()

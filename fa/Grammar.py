@@ -295,7 +295,34 @@ class Grammar:
             self.P[lhs] = new_rhs
 
     def replace_long_productions(self):
-        pass
+        additional_productions = {}
+        additional_productions_number = 0
+        change_detected = True
+        while change_detected:
+            change_detected = False
+            new_transitions = {}
+            for lhs, rhs_list in self.P.items():
+                for rhs in rhs_list:
+                    if len(rhs) > 2:
+                        end_part_list = rhs[1:]
+                        end_part = "".join(end_part_list)
+                        if end_part in additional_productions:
+                            new_state = additional_productions[end_part]
+                        else:
+                            new_state = f"X{additional_productions_number}"
+                            additional_productions_number += 1
+                            additional_productions[end_part] = new_state
+                            # self.P[new_state] = end_part_list
+                            new_transitions[new_state] = [end_part_list]
+                            change_detected = True
+                            self.V_n.add(new_state)
+                        new_rhs = [rhs[0], new_state]
+                        rhs_list.remove(rhs)
+                        rhs_list.append(new_rhs)
+
+            for lhs, rhs_list in new_transitions.items():
+                self.P[lhs] = rhs_list
+
 
     def __str__(self):
         p_rules = ";\n".join(f"{{{key}}} -> {prod}" for key, prod in self.P.items())
