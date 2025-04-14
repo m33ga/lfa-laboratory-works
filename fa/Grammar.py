@@ -276,6 +276,8 @@ class Grammar:
         for state in inaccessible:
             if state in self.P:
                 del self.P[state]
+            if state in self.V_n:
+                self.V_n.remove(state)
 
     def replace_terminals(self):
         terminal_dict = {}
@@ -312,7 +314,6 @@ class Grammar:
                             new_state = f"X{additional_productions_number}"
                             additional_productions_number += 1
                             additional_productions[end_part] = new_state
-                            # self.P[new_state] = end_part_list
                             new_transitions[new_state] = [end_part_list]
                             change_detected = True
                             self.V_n.add(new_state)
