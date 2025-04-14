@@ -7,7 +7,7 @@ def main():
     p = {
         "S": ["A"],
         "A": ["aX", "bX"],
-        "X": ["", "BAX", "b"],
+        "X": ["", "BX", "b"],
         "B": ["AD"],
         "D": ["aD", "a"],
         "C": ["Ca"],
@@ -15,28 +15,7 @@ def main():
     s = {"S"}
 
     grammar = Grammar(v_n, v_t, p, s)
-    print(grammar)
-    print()
-    nullable_set = grammar.get_nullable()
-    print(nullable_set)
-    print()
-    grammar.eliminate_epsilon_productions(nullable_set)
-    print(grammar)
-    grammar.eliminate_unit_productions()
-    print()
-    print(grammar)
-    grammar.eliminate_nonproductive()
-    print()
-    print(grammar)
-    grammar.eliminate_inaccessible()
-    print()
-    print(grammar)
-    grammar.replace_terminals()
-    print()
-    print(grammar)
-    grammar.replace_long_productions()
-    print()
-    print(grammar)
+    grammar.normalize_cnf()
 
 
 if __name__ == "__main__":

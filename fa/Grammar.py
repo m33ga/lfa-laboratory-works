@@ -161,11 +161,34 @@ class Grammar:
         # step 1
         nullable = self.get_nullable()
         self.eliminate_epsilon_productions(nullable)
+        print()
+        print("Grammar after removing epsilon transitions:")
+        print(self)
 
         # step 2
+        self.eliminate_unit_productions()
+        print()
+        print("Grammar after removing unit productions:")
+        print(self)
 
         # step 3
-        pass
+        self.eliminate_nonproductive()
+        print()
+        print("Grammar after removing non-productive transitions:")
+        print(self)
+
+        # step 4
+        self.eliminate_inaccessible()
+        print()
+        print("Grammar after removing inaccessible states and transitions:")
+        print(self)
+
+        # step 5
+        self.replace_terminals()
+        self.replace_long_productions()
+        print()
+        print("Grammar after bringing to CNF:")
+        print(self)
 
     def get_nullable(self):
         nullable = set()
