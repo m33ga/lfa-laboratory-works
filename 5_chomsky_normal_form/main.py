@@ -15,6 +15,7 @@ def main():
     s = {"S"}
 
     grammar = Grammar(v_n, v_t, p, s)
+    print(grammar)
     grammar.normalize_cnf()
 
 
