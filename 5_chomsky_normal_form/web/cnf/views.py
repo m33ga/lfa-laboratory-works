@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import GrammarForm
-from fa import Grammar  # adjust if needed
+from fa import Grammar
 
 
 def grammar_view(request):

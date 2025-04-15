@@ -1,5 +1,6 @@
 from django import forms
 
+
 class GrammarForm(forms.Form):
     non_terminals = forms.CharField(label="Non-terminals (comma-separated)", max_length=500)
     terminals = forms.CharField(label="Terminals (comma-separated)", max_length=500)
