@@ -166,29 +166,28 @@ class Grammar:
         nullable = self.get_nullable()
         self.eliminate_epsilon_productions(nullable)
         normalization_steps["Step 1: Remove Epsilon Productions"] = str(self)
-        print(self)
 
         # Step 2: Remove unit productions
         self.eliminate_unit_productions()
         normalization_steps["Step 2: Remove Unit Productions"] = str(self)
-        print(self)
 
         # Step 3: Remove non-productive symbols
         self.eliminate_nonproductive()
         normalization_steps["Step 3: Remove Non-Productive Symbols"] = str(self)
-        print(self)
 
         # Step 4: Remove inaccessible symbols
         self.eliminate_inaccessible()
         normalization_steps["Step 4: Remove Inaccessible Symbols"] = str(self)
-        print(self)
 
         # Step 5: Convert to CNF
         self.replace_terminals()
         self.replace_long_productions()
         normalization_steps["Result: Bring to Chomsky Normal Form (CNF)"] = str(self)
-        print(self)
-
+        
+        for key, value in normalization_steps.items():
+            print(key)
+            print(value)
+            print()
         return normalization_steps
 
     def get_nullable(self):
