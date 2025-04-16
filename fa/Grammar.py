@@ -138,7 +138,7 @@ class Grammar:
     # The implemented functionality needs executed and tested.
     # Also, another BONUS point would be given if the student will make the aforementioned function to accept any grammar, not only the one from the student's variant.
 
-    def normalize_cnf(self):
+    # def normalize_cnf(self):
         # steps:
         # 1. eliminate epsilon productions
         # 2. eliminate renaming productions (X -> Y)
@@ -158,37 +158,32 @@ class Grammar:
         #     "C": ["Ca"],
         # }
 
-        # step 1
+    def normalize_cnf(self):
+        normalization_steps = {}
+
+        # Step 1: Remove epsilon productions
         nullable = self.get_nullable()
         self.eliminate_epsilon_productions(nullable)
-        print()
-        print("Grammar after removing epsilon transitions:")
-        print(self)
+        normalization_steps["Step 1: Remove Epsilon Productions"] = str(self)
 
-        # step 2
+        # Step 2: Remove unit productions
         self.eliminate_unit_productions()
-        print()
-        print("Grammar after removing unit productions:")
-        print(self)
+        normalization_steps["Step 2: Remove Unit Productions"] = str(self)
 
-        # step 3
+        # Step 3: Remove non-productive symbols
         self.eliminate_nonproductive()
-        print()
-        print("Grammar after removing non-productive transitions:")
-        print(self)
+        normalization_steps["Step 3: Remove Non-Productive Symbols"] = str(self)
 
-        # step 4
+        # Step 4: Remove inaccessible symbols
         self.eliminate_inaccessible()
-        print()
-        print("Grammar after removing inaccessible states and transitions:")
-        print(self)
+        normalization_steps["Step 4: Remove Inaccessible Symbols"] = str(self)
 
-        # step 5
+        # Step 5: Convert to CNF
         self.replace_terminals()
         self.replace_long_productions()
-        print()
-        print("Grammar after bringing to CNF:")
-        print(self)
+        normalization_steps["Result: Bring to Chomsky Normal Form (CNF)"] = str(self)
+
+        return normalization_steps
 
     def get_nullable(self):
         nullable = set()
