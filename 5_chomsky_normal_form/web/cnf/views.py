@@ -11,10 +11,20 @@ def grammar_view(request):
 
     if request.method == "POST":
         if "step" in request.POST and request.POST["step"] == "2":
-            non_terminals = request.POST.get("non_terminals").replace(" ", "").split(",")
-            terminals = request.POST.get("terminals").replace(" ", "").split(",")
-            start_symbol = request.POST.get("start_symbol").strip()
-            ProductionForm = generate_production_form(non_terminals)
+            raw_nt = request.POST.get("non_terminals", "")
+            raw_t = request.POST.get("terminals", "")
+            raw_s = request.POST.get("start_symbol", "")
+
+            non_terminals = raw_nt.replace(" ", "").split(",")
+            terminals = raw_t.replace(" ", "").split(",")
+            start_symbol = raw_s.strip()
+            form = GrammarBasicForm({
+                "non_terminals": raw_nt,
+                "terminals": raw_t,
+                "start_symbol": raw_s
+            })
+
+            ProductionForm = generate_production_form(non_terminals, terminals)
             production_form = ProductionForm(request.POST)
 
             if production_form.is_valid():
@@ -45,7 +55,8 @@ def grammar_view(request):
             if form.is_valid():
                 step = 2
                 non_terminals = form.cleaned_data["non_terminals"].replace(" ", "").split(",")
-                ProductionForm = generate_production_form(non_terminals)
+                terminals = form.cleaned_data["terminals"].replace(" ", "").split(",")
+                ProductionForm = generate_production_form(non_terminals, terminals)
                 production_form = ProductionForm()
     else:
         form = GrammarBasicForm()
