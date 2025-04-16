@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit
+from crispy_forms.layout import Layout, Submit, Field
 from crispy_bootstrap5.bootstrap5 import FloatingField
 
 
@@ -35,6 +35,13 @@ def generate_production_form(non_terminals, terminals):
             super().__init__(*args, **kwargs)
             self.valid_symbols = set(non_terminals).union(set(terminals))
 
+            self.helper = FormHelper()
+            self.helper.form_method = "post"
+            self.helper.layout = Layout(
+                *[Field(nt) for nt in non_terminals],  # Dynamically add fields
+                Submit("submit", "Normalize to CNF", css_class="btn btn-success"),
+            )
+
         def clean(self):
             cleaned_data = super().clean()
 
@@ -52,8 +59,9 @@ def generate_production_form(non_terminals, terminals):
 
     for nt in non_terminals:
         ProductionForm.base_fields[nt] = forms.CharField(
-            label=f"{nt} → (comma-separated productions)",
-            required=False
+            label=f"Productions for {nt} ->",
+            required=False,
+            widget=forms.TextInput(attrs={"placeholder": f"ex: Aa, Bb, b"}),
         )
 
     return ProductionForm

@@ -17,25 +17,13 @@
             {% elif step == 2 %}
                 <form method="post">
                     {% csrf_token %}
-                    <!-- Preserve initial data -->
                     <input type="hidden" name="step" value="2">
                     <input type="hidden" name="non_terminals" value="{{ form.non_terminals.value|escape }}">
                     <input type="hidden" name="terminals" value="{{ form.terminals.value|escape }}">
                     <input type="hidden" name="start_symbol" value="{{ form.start_symbol.value|escape }}">
 
-                    {% for field in production_form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                        <div class="text-danger">
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
+                    {% crispy production_form %}
 
-                    <button type="submit" class="btn btn-success">Normalize to CNF</button>
                 </form>
             {% endif %}
         </div>
