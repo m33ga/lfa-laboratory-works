@@ -1,4 +1,4 @@
-# The title of the work
+# Chomsky Normal Form
 
 ### Course: Formal Languages & Finite Automata
 ### Author: Mihai Gurduza
