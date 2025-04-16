@@ -1,11 +1,32 @@
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit
+from crispy_bootstrap5.bootstrap5 import FloatingField
 
 
 class GrammarBasicForm(forms.Form):
-    non_terminals = forms.CharField(label="Non-terminals (comma-separated)", max_length=500)
-    terminals = forms.CharField(label="Terminals (comma-separated)", max_length=500)
-    start_symbol = forms.CharField(label="Start Symbol", max_length=100)
+    non_terminals = forms.CharField(
+        label="Non-terminals (comma-separated)",
+        max_length=500,
+    )
+    terminals = forms.CharField(
+        label="Terminals (comma-separated)",
+        max_length=500,
+    )
+    start_symbol = forms.CharField(
+        label="Start Symbol",
+        max_length=100,
+    )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            FloatingField("non_terminals"),
+            FloatingField("terminals"),
+            FloatingField("start_symbol"),
+            Submit("submit", "Next: Add Productions", css_class="btn btn-primary"),
+        )
 
 
 def generate_production_form(non_terminals, terminals):
