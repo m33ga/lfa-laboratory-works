@@ -8,6 +8,7 @@ def grammar_view(request):
     result = None
     form = GrammarBasicForm()
     production_form = None
+    normalization_steps = None
 
     if request.method == "POST":
         if "step" in request.POST and request.POST["step"] == "2":
@@ -18,38 +19,39 @@ def grammar_view(request):
             non_terminals = raw_nt.replace(" ", "").split(",")
             terminals = raw_t.replace(" ", "").split(",")
             start_symbol = raw_s.strip()
+
             form = GrammarBasicForm({
                 "non_terminals": raw_nt,
                 "terminals": raw_t,
                 "start_symbol": raw_s
             })
 
-            ProductionForm = generate_production_form(non_terminals, terminals)
-            production_form = ProductionForm(request.POST)
+            if form.is_valid():
+                ProductionForm = generate_production_form(non_terminals, terminals)
+                production_form = ProductionForm(request.POST)
 
-            if production_form.is_valid():
-                V_n = set(non_terminals)
-                V_t = set(terminals)
-                S = {start_symbol}
-                P = {}
+                if production_form.is_valid():
+                    V_n = set(non_terminals)
+                    V_t = set(terminals)
+                    S = {start_symbol}
+                    P = {}
 
-                for nt in non_terminals:
-                    rhs = production_form.cleaned_data.get(nt, "")
-                    if rhs.strip() == "":
-                        P[nt] = [""]
-                    else:
-                        P[nt] = [r.strip() if r.strip() else "" for r in rhs.split(",")]
+                    for nt in non_terminals:
+                        rhs = production_form.cleaned_data.get(nt, "")
+                        if rhs.strip() == "":
+                            P[nt] = [""]
+                        else:
+                            P[nt] = [r.strip() if r.strip() else "" for r in rhs.split(",")]
 
-                grammar = Grammar(V_n, V_t, P, S)
-                print(grammar)
-                grammar.normalize_cnf()
-                result = str(grammar)
+                    grammar = Grammar(V_n, V_t, P, S)
+                    normalization_steps = grammar.normalize_cnf()
 
-                form = GrammarBasicForm()
-                production_form = None
+                    form = GrammarBasicForm()
+                    production_form = None
+                else:
+                    step = 2
             else:
-                step = 2
-
+                step = 1
         else:
             form = GrammarBasicForm(request.POST)
             if form.is_valid():
@@ -68,6 +70,6 @@ def grammar_view(request):
             "form": form,
             "production_form": production_form,
             "step": step,
-            "result": result,
+            "normalization_steps": normalization_steps,
         }
     )

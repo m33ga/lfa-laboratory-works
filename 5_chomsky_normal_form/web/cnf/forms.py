@@ -28,6 +28,22 @@ class GrammarBasicForm(forms.Form):
             Submit("submit", "Next: Add Productions", css_class="btn btn-primary"),
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        raw_nt = cleaned_data.get("non_terminals", "")
+        raw_s = cleaned_data.get("start_symbol", "")
+
+        non_terminals = set(raw_nt.replace(" ", "").split(","))
+
+        if raw_s.strip() not in non_terminals:
+            self.add_error(
+                "start_symbol",
+                f"The start symbol '{raw_s}' must be one of the non-terminals: {', '.join(non_terminals)}."
+            )
+
+        return cleaned_data
+
 
 def generate_production_form(non_terminals, terminals):
     class ProductionForm(forms.Form):
@@ -38,7 +54,7 @@ def generate_production_form(non_terminals, terminals):
             self.helper = FormHelper()
             self.helper.form_method = "post"
             self.helper.layout = Layout(
-                *[Field(nt) for nt in non_terminals],  # Dynamically add fields
+                *[Field(nt) for nt in non_terminals],
                 Submit("submit", "Normalize to CNF", css_class="btn btn-success"),
             )
 
