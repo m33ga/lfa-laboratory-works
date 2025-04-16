@@ -183,3 +183,11 @@ fabric.properties
 
 # idea folder, uncomment if you don't need it
 # .idea
+/5_chomsky_normal_form/web/.idea/
+/5_chomsky_normal_form/web/db.sqlite3
+/2_finite_automata/graph_drawings/DFA
+/2_finite_automata/graph_drawings/DFA.png
+/2_finite_automata/graph_drawings/FA1
+/2_finite_automata/graph_drawings/FA1.png
+/2_finite_automata/graph_drawings/NFA
+/2_finite_automata/graph_drawings/NFA.png
