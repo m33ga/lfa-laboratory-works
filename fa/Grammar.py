@@ -280,11 +280,12 @@ class Grammar:
         unproductive = set(self.V_n) - productive
         for state in unproductive:
             del self.P[state]
+            self.V_n.remove(state)
+            if state in self.S:
+                self.S.remove(state)
 
     def eliminate_inaccessible(self):
-        # remove states which can not be reached
         accessible = self.S.copy()
-        # accessible.add(self.S)
         change_detected = True
         while change_detected:
             change_detected = False
@@ -304,20 +305,21 @@ class Grammar:
 
     def replace_terminals(self):
         terminal_dict = {}
-        for terminal in self.V_t:
-            new_state = f"T_{terminal}"
-            self.V_n.add(new_state)
-            self.P[new_state] = list(terminal)
-            terminal_dict[terminal] = new_state
+        if not self.V_n == set():
+            for terminal in self.V_t:
+                new_state = f"T_{terminal}"
+                self.V_n.add(new_state)
+                self.P[new_state] = list(terminal)
+                terminal_dict[terminal] = new_state
 
-        for lhs, rhs_list in self.P.items():
-            new_rhs = []
-            for rhs in rhs_list:
-                if len(rhs) > 1:
-                    new_rhs.append([terminal_dict.get(symbol, symbol) for symbol in rhs])
-                else:
-                    new_rhs.append(rhs)
-            self.P[lhs] = new_rhs
+            for lhs, rhs_list in self.P.items():
+                new_rhs = []
+                for rhs in rhs_list:
+                    if len(rhs) > 1:
+                        new_rhs.append([terminal_dict.get(symbol, symbol) for symbol in rhs])
+                    else:
+                        new_rhs.append(rhs)
+                self.P[lhs] = new_rhs
 
     def replace_long_productions(self):
         additional_productions = {}
