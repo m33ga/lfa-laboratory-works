@@ -160,28 +160,34 @@ class Grammar:
 
     def normalize_cnf(self):
         normalization_steps = {}
+        normalization_steps["Original Grammar:"] = str(self)
 
         # Step 1: Remove epsilon productions
         nullable = self.get_nullable()
         self.eliminate_epsilon_productions(nullable)
         normalization_steps["Step 1: Remove Epsilon Productions"] = str(self)
+        print(self)
 
         # Step 2: Remove unit productions
         self.eliminate_unit_productions()
         normalization_steps["Step 2: Remove Unit Productions"] = str(self)
+        print(self)
 
         # Step 3: Remove non-productive symbols
         self.eliminate_nonproductive()
         normalization_steps["Step 3: Remove Non-Productive Symbols"] = str(self)
+        print(self)
 
         # Step 4: Remove inaccessible symbols
         self.eliminate_inaccessible()
         normalization_steps["Step 4: Remove Inaccessible Symbols"] = str(self)
+        print(self)
 
         # Step 5: Convert to CNF
         self.replace_terminals()
         self.replace_long_productions()
         normalization_steps["Result: Bring to Chomsky Normal Form (CNF)"] = str(self)
+        print(self)
 
         return normalization_steps
 
@@ -240,7 +246,7 @@ class Grammar:
 
             while found:
                 found = False
-                for state in reachable_states:
+                for state in reachable_states.copy():
                     if state not in analyzed_states:
                         for production in self.P[state]:
                             if production in self.V_n and production not in analyzed_states and production not in reachable_states:
