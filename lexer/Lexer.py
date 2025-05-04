@@ -6,17 +6,24 @@ class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
+        self.line = 1
+        self.column = 1
         self.current_char = self.text[self.pos] if self.text else None
 
-    def error(self):
-        raise Exception(f"Invalid character: {self.current_char}")
-
     def go_next_char(self):
+        if self.current_char == '\n':
+            self.line += 1
+            self.column = 1
+        else:
+            self.column += 1
         self.pos += 1
         if self.pos < len(self.text):
             self.current_char = self.text[self.pos]
         else:
             self.current_char = None
+
+    def error(self, message="Invalid character"):
+        raise Exception(f"{message} at line {self.line}, column {self.column}: '{self.current_char}'")
 
     def skip_whitespace(self):
         while self.current_char is not None and self.current_char.isspace():
@@ -31,6 +38,7 @@ class Lexer:
 
     def identifier(self):
         result = ""
+        col = self.column
         while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
             result += self.current_char
             self.go_next_char()
@@ -73,17 +81,18 @@ class Lexer:
             'month': TokenType.MONTH,
             'day': TokenType.DAY
         }
-        return Token(keywords.get(result, TokenType.ID), result)
+        return Token(keywords.get(result, TokenType.ID), result, self.line, col)
 
     def string(self):
         result = ""
+        col = self.column
         self.go_next_char()
         while self.current_char is not None and self.current_char != '"':
             result += self.current_char
             self.go_next_char()
         if self.current_char == '"':
             self.go_next_char()
-            return Token(TokenType.STRING, result)
+            return Token(TokenType.STRING, result, self.line, col)
         else:
             self.error()
 
@@ -96,7 +105,7 @@ class Lexer:
                     continue
 
                 case c if c.isdigit():
-                    return Token(TokenType.INT, self.integer())
+                    return Token(TokenType.INT, self.integer(), self.line, self.column)
 
                 case c if c.isalpha() or c == '_':
                     return self.identifier()
@@ -108,67 +117,67 @@ class Lexer:
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token(TokenType.EQ_EQ, '==')
-                    return Token(TokenType.EQ, '=')
+                        return Token(TokenType.EQ_EQ, '==', self.line, self.column-2)
+                    return Token(TokenType.EQ, '=', self.line, self.column-1)
 
                 case ',':
                     self.go_next_char()
-                    return Token(TokenType.COMMA, ',')
+                    return Token(TokenType.COMMA, ',', self.line, self.column-1)
 
                 case ';':
                     self.go_next_char()
-                    return Token(TokenType.SEMI, ';')
+                    return Token(TokenType.SEMI, ';', self.line, self.column-1)
 
                 case '.':
                     self.go_next_char()
-                    return Token(TokenType.DOT, '.')
+                    return Token(TokenType.DOT, '.', self.line, self.column-1)
 
                 case '(':
                     self.go_next_char()
-                    return Token(TokenType.LPAREN, '(')
+                    return Token(TokenType.LPAREN, '(', self.line, self.column-1)
 
                 case ')':
                     self.go_next_char()
-                    return Token(TokenType.RPAREN, ')')
+                    return Token(TokenType.RPAREN, ')', self.line, self.column-1)
 
                 case '{':
                     self.go_next_char()
-                    return Token(TokenType.LCURLY, '{')
+                    return Token(TokenType.LCURLY, '{', self.line, self.column-1)
 
                 case '}':
                     self.go_next_char()
-                    return Token(TokenType.RCURLY, '}')
+                    return Token(TokenType.RCURLY, '}', self.line, self.column-1)
 
                 case '-':
                     self.go_next_char()
-                    return Token(TokenType.DASH, '-')
+                    return Token(TokenType.DASH, '-', self.line, self.column-1)
 
                 case '+':
                     self.go_next_char()
-                    return Token(TokenType.ADD_OP, '+')
+                    return Token(TokenType.ADD_OP, '+', self.line, self.column-1)
 
                 case '<':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token(TokenType.LE, '<=')
-                    return Token(TokenType.LT, '<')
+                        return Token(TokenType.LE, '<=', self.line, self.column-2)
+                    return Token(TokenType.LT, '<', self.line, self.column-1)
 
                 case '>':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token(TokenType.GE, '>=')
-                    return Token(TokenType.GT, '>')
+                        return Token(TokenType.GE, '>=', self.line, self.column-2)
+                    return Token(TokenType.GT, '>', self.line, self.column-1)
 
                 case '!':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token(TokenType.NEQ, '!=')
+                        return Token(TokenType.NEQ, '!=', self.line, self.column-2)
                     self.error()
 
                 case _:
                     self.error()
 
-        return Token(TokenType.EOF, None)
+        return Token(TokenType.EOF, None, self.line, self.column-1)
