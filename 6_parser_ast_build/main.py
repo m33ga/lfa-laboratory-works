@@ -1,10 +1,12 @@
 import sys
-from lexer import Lexer, TokenType
+import json
+from lexer import Lexer
+from parser import Parser, ast_to_dict
 
 
 def read_file(file_path):
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
@@ -15,21 +17,26 @@ def read_file(file_path):
 
 
 def main():
-    # file path is passed as arg
     if len(sys.argv) > 1:
         file_path = sys.argv[1]
         text = read_file(file_path)
     else:
-        print("enter DSL input (Ctrl+D to end):")
+        print("Enter DSL input (Ctrl+D to end):")
         text = sys.stdin.read()
 
     lexer = Lexer(text)
-    print("tokens:")
-    while True:
-        token = lexer.get_next_token()
-        print(token)
-        if token.type == TokenType.EOF:
-            break
+    parser = Parser(lexer)
+
+    try:
+        ast = parser.parse_program()
+
+        print("\nAbstract Syntax Tree (AST):\n")
+        ast_dict = ast_to_dict(ast)
+        print(json.dumps(ast_dict, indent=2))
+
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
