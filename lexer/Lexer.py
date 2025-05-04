@@ -1,4 +1,5 @@
 from .Token import Token
+from .TokenType import TokenType
 
 
 class Lexer:
@@ -36,44 +37,43 @@ class Lexer:
 
         # check if id is reserved keyword
         keywords = {
-            'event': 'EVENT',
-            'period': 'PERIOD',
-            'timeline': 'TIMELINE',
-            'relationship': 'RELATIONSHIP',
-            'main': 'MAIN',
-            'export': 'EXPORT',
-            'if': 'IF',
-            'else': 'ELSE',
-            'for': 'FOR',
-            'in': 'IN',
-            'modify': 'MODIFY',
-            'high': 'HIGH',
-            'medium': 'MEDIUM',
-            'low': 'LOW',
-            'cause-effect': 'CAUSE_EFFECT',
-            'contemporaneous': 'CONTEMPORANEOUS',
-            'precedes': 'PRECEDES',
-            'follows': 'FOLLOWS',
-            'includes': 'INCLUDES',
-            'excludes': 'EXCLUDES',
-            'BCE': 'BCE',
-            'CE': 'CE',
-            'true': 'TRUE',
-            'false': 'FALSE',
-            'title': 'TITLE',
-            'date': 'DATE',
-            'start': 'START',
-            'end': 'END',
-            'importance': 'IMPORTANCE',
-            'from': 'FROM',
-            'to': 'TO',
-            'type': 'TYPE',
-            'year': 'YEAR',
-            'month': 'MONTH',
-            'day': 'DAY'
+            'event': TokenType.EVENT,
+            'period': TokenType.PERIOD,
+            'timeline': TokenType.TIMELINE,
+            'relationship': TokenType.RELATIONSHIP,
+            'main': TokenType.MAIN,
+            'export': TokenType.EXPORT,
+            'if': TokenType.IF,
+            'else': TokenType.ELSE,
+            'for': TokenType.FOR,
+            'in': TokenType.IN,
+            'modify': TokenType.MODIFY,
+            'high': TokenType.HIGH,
+            'medium': TokenType.MEDIUM,
+            'low': TokenType.LOW,
+            'cause-effect': TokenType.CAUSE_EFFECT,
+            'contemporaneous': TokenType.CONTEMPORANEOUS,
+            'precedes': TokenType.PRECEDES,
+            'follows': TokenType.FOLLOWS,
+            'includes': TokenType.INCLUDES,
+            'excludes': TokenType.EXCLUDES,
+            'BCE': TokenType.BCE,
+            'CE': TokenType.CE,
+            'true': TokenType.TRUE,
+            'false': TokenType.FALSE,
+            'title': TokenType.TITLE,
+            'date': TokenType.DATE,
+            'start': TokenType.START,
+            'end': TokenType.END,
+            'importance': TokenType.IMPORTANCE,
+            'from': TokenType.FROM,
+            'to': TokenType.TO,
+            'type': TokenType.TYPE,
+            'year': TokenType.YEAR,
+            'month': TokenType.MONTH,
+            'day': TokenType.DAY
         }
-
-        return Token(keywords.get(result, 'ID'), result)
+        return Token(keywords.get(result, TokenType.ID), result)
 
     def string(self):
         result = ""
@@ -83,7 +83,7 @@ class Lexer:
             self.go_next_char()
         if self.current_char == '"':
             self.go_next_char()
-            return Token('STRING', result)
+            return Token(TokenType.STRING, result)
         else:
             self.error()
 
@@ -96,7 +96,7 @@ class Lexer:
                     continue
 
                 case c if c.isdigit():
-                    return Token('INT', self.integer())
+                    return Token(TokenType.INT, self.integer())
 
                 case c if c.isalpha() or c == '_':
                     return self.identifier()
@@ -108,67 +108,67 @@ class Lexer:
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token('EQ_EQ', '==')
-                    return Token('EQ', '=')
+                        return Token(TokenType.EQ_EQ, '==')
+                    return Token(TokenType.EQ, '=')
 
                 case ',':
                     self.go_next_char()
-                    return Token('COMMA', ',')
+                    return Token(TokenType.COMMA, ',')
 
                 case ';':
                     self.go_next_char()
-                    return Token('SEMI', ';')
+                    return Token(TokenType.SEMI, ';')
 
                 case '.':
                     self.go_next_char()
-                    return Token('DOT', '.')
+                    return Token(TokenType.DOT, '.')
 
                 case '(':
                     self.go_next_char()
-                    return Token('LPAREN', '(')
+                    return Token(TokenType.LPAREN, '(')
 
                 case ')':
                     self.go_next_char()
-                    return Token('RPAREN', ')')
+                    return Token(TokenType.RPAREN, ')')
 
                 case '{':
                     self.go_next_char()
-                    return Token('LCURLY', '{')
+                    return Token(TokenType.LCURLY, '{')
 
                 case '}':
                     self.go_next_char()
-                    return Token('RCURLY', '}')
+                    return Token(TokenType.RCURLY, '}')
 
                 case '-':
                     self.go_next_char()
-                    return Token('DASH', '-')
+                    return Token(TokenType.DASH, '-')
 
                 case '+':
                     self.go_next_char()
-                    return Token('ADD_OP', '+')
+                    return Token(TokenType.ADD_OP, '+')
 
                 case '<':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token('LE', '<=')
-                    return Token('LT', '<')
+                        return Token(TokenType.LE, '<=')
+                    return Token(TokenType.LT, '<')
 
                 case '>':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token('GE', '>=')
-                    return Token('GT', '>')
+                        return Token(TokenType.GE, '>=')
+                    return Token(TokenType.GT, '>')
 
                 case '!':
                     self.go_next_char()
                     if self.current_char == '=':
                         self.go_next_char()
-                        return Token('NEQ', '!=')
+                        return Token(TokenType.NEQ, '!=')
                     self.error()
 
                 case _:
                     self.error()
 
-        return Token('EOF', None)
+        return Token(TokenType.EOF, None)

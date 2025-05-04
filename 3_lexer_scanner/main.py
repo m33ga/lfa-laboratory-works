@@ -1,5 +1,5 @@
 import sys
-from lexer import Lexer
+from lexer import Lexer, TokenType
 
 
 def read_file(file_path):
@@ -28,10 +28,9 @@ def main():
     while True:
         token = lexer.get_next_token()
         print(token)
-        if token.type == 'EOF':
+        if token.type == TokenType.EOF:
             break
 
 
 if __name__ == "__main__":
     main()
-
