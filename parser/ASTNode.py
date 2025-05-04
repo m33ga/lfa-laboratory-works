@@ -129,3 +129,14 @@ class PropertyAssignment(ASTNode):
 
     def __repr__(self):
         return f"{self.property_name} = {self.value}"
+
+
+def ast_to_dict(node):
+    if isinstance(node, list):
+        return [ast_to_dict(n) for n in node]
+    if not isinstance(node, ASTNode):
+        return node
+    return {
+        '__type__': node.__class__.__name__,
+        **{k: ast_to_dict(v) for k, v in node.__dict__.items()}
+    }
